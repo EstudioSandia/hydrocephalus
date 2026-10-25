@@ -39,6 +39,7 @@
 #include <core/Preferences/Preferences.h>
 #include <core/SoundLibrary/SoundLibraryDatabase.h>
 
+#include <QCheckBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -54,10 +55,10 @@ PatternPropertiesDialog::PatternPropertiesDialog(
 	int nSelectedPattern,
 	Action action
 )
-	: QDialog( pParent ),
-	  m_pPattern( pPattern ),
-	  m_nSelectedPattern( nSelectedPattern ),
-	  m_action( action )
+: QDialog( pParent ),
+m_pPattern( pPattern ),
+m_nSelectedPattern( nSelectedPattern ),
+m_action( action )
 {
 	auto pPref = Preferences::get_instance();
 	auto pCommonStrings = HydrogenApp::get_instance()->getCommonStrings();
@@ -79,7 +80,7 @@ PatternPropertiesDialog::PatternPropertiesDialog(
 		windowFlags() | Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint
 	);
 
-	resize( 657, 542 );
+	resize( 657, 580 );
 
 	// Overall layout
 	auto pOverallLayout = new QVBoxLayout( this );
@@ -92,13 +93,13 @@ PatternPropertiesDialog::PatternPropertiesDialog(
 	pOverallLayout->addWidget( pScrollArea );
 
 	auto pScrollAreaContent = new QWidget( pScrollArea );
-	pScrollAreaContent->setMinimumSize( 652, 534 );
+	pScrollAreaContent->setMinimumSize( 652, 570 );
 	pScrollAreaContent->setStyleSheet(
 		QString( "\
 QWidget#PatternPropsFormContainer {				\
-    background-color: %1;						\
+background-color: %1;						\
 }" )
-			.arg( pPref->getColorTheme()->m_midLightColor.name() )
+		.arg( pPref->getColorTheme()->m_midLightColor.name() )
 	);
 	pScrollArea->setWidget( pScrollAreaContent );
 
@@ -148,36 +149,43 @@ QWidget#PatternPropsFormContainer {				\
 	m_pVersionSpinBox = new LCDSpinBox( pFormContainer );
 	pGridLayout->addWidget( m_pVersionSpinBox, 2, 1 );
 
+	// Generative Swap Toggle Checkbox (Moved to Row 3 for visibility)
+	auto pGenerativeSwapLabel = new QLabel( tr( "Generative Swap" ), pFormContainer );
+	pGridLayout->addWidget( pGenerativeSwapLabel, 3, 0 );
+
+	m_pGenerativeSwapCheckBox = new QCheckBox( tr( "Enable randomized sub-pattern selection mode (Generative Swap)" ), pFormContainer );
+	pGridLayout->addWidget( m_pGenerativeSwapCheckBox, 3, 1 );
+
 	auto pAuthorLabel = new QLabel( pFormContainer );
-	pGridLayout->addWidget( pAuthorLabel, 3, 0 );
+	pGridLayout->addWidget( pAuthorLabel, 4, 0 );
 
 	m_pAuthorTxt = new LCDDisplay( pFormContainer );
-	pGridLayout->addWidget( m_pAuthorTxt, 3, 1 );
+	pGridLayout->addWidget( m_pAuthorTxt, 4, 1 );
 
 	auto pLicenseLabel = new QLabel( pFormContainer );
 	pLicenseLabel->setMinimumHeight( 20 );
-	pGridLayout->addWidget( pLicenseLabel, 4, 0 );
+	pGridLayout->addWidget( pLicenseLabel, 5, 0 );
 
 	m_pLicenseComboBox = new LCDCombo( pFormContainer );
 	m_pLicenseComboBox->setSizePolicy(
 		QSizePolicy::Expanding, QSizePolicy::Fixed
 	);
-	pGridLayout->addWidget( m_pLicenseComboBox, 4, 1 );
+	pGridLayout->addWidget( m_pLicenseComboBox, 5, 1 );
 
 	m_pLicenseStringTxt = new LCDDisplay( pFormContainer );
-	pGridLayout->addWidget( m_pLicenseStringTxt, 5, 1 );
+	pGridLayout->addWidget( m_pLicenseStringTxt, 6, 1 );
 
 	auto pNotesLabel = new QLabel( pFormContainer );
-	pGridLayout->addWidget( pNotesLabel, 6, 0 );
+	pGridLayout->addWidget( pNotesLabel, 7, 0 );
 
 	m_pPatternDescTxt = new LCDTextEdit( pFormContainer );
-	pGridLayout->addWidget( m_pPatternDescTxt, 6, 1 );
+	pGridLayout->addWidget( m_pPatternDescTxt, 7, 1 );
 
 	auto pTagsLabel = new QLabel( pFormContainer );
-	pGridLayout->addWidget( pTagsLabel, 7, 0 );
+	pGridLayout->addWidget( pTagsLabel, 8, 0 );
 
 	m_pTagEdit = new TagEdit( pFormContainer );
-	pGridLayout->addWidget( m_pTagEdit, 7, 1 );
+	pGridLayout->addWidget( m_pTagEdit, 8, 1 );
 
 	// Bottom button bar
 	auto pButtonLayout = new QHBoxLayout();
@@ -241,19 +249,21 @@ QWidget#PatternPropsFormContainer {				\
 		}
 		m_pPatternDescTxt->setText( pPattern->getInfo() );
 		m_pPatternNameTxt->setText( pPattern->getName() );
+		m_pGenerativeSwapCheckBox->setChecked( pPattern->getGenerativeSwap() );
+
 		// Only if we duplicate the pattern in the pattern list of the current
 		// song (Action::ModifyViaUndo) we care about uniqueness. This approach
 		// would scale badly within the sound library.
 		if ( ( action & Action::ModifyViaUndo ) &&
-			 ( action & Action::Duplicate ) ) {
+			( action & Action::Duplicate ) ) {
 			auto pPatternList =
-				Hydrogen::get_instance()->getSong()->getPatternList();
-			m_pPatternNameTxt->setText(
-				pPatternList->findUnusedPatternName( pPattern->getName() )
-			);
-		}
+			Hydrogen::get_instance()->getSong()->getPatternList();
+		m_pPatternNameTxt->setText(
+			pPatternList->findUnusedPatternName( pPattern->getName() )
+		);
+			}
 
-		tags = pPattern->getTags();
+			tags = pPattern->getTags();
 	}
 
 	if ( action & Action::SaveAs ) {
@@ -264,10 +274,10 @@ QWidget#PatternPropsFormContainer {				\
 		);
 		connect(
 			m_pPathEdit, &QLineEdit::textChanged,
-			[&]( const QString& sNewText ) {
-				m_pOkBtn->setEnabled( sNewText.endsWith( Filesystem::sPatternSuffix
-				) );
-			}
+		  [&]( const QString& sNewText ) {
+			  m_pOkBtn->setEnabled( sNewText.endsWith( Filesystem::sPatternSuffix
+			  ) );
+		  }
 		);
 	}
 	else {
@@ -277,7 +287,7 @@ QWidget#PatternPropsFormContainer {				\
 
 	connect(
 		m_pLicenseComboBox, SIGNAL( currentIndexChanged( int ) ), this,
-		SLOT( licenseComboBoxChanged( int ) )
+			SLOT( licenseComboBoxChanged( int ) )
 	);
 
 	m_pLicenseComboBox->setToolTip( pCommonStrings->getLicenseComboToolTip() );
@@ -288,97 +298,99 @@ QWidget#PatternPropsFormContainer {				\
 	m_pTagEdit->setTags( pPattern->getTags() );
 
 	if ( !m_pPathEdit->text().isEmpty() &&
-		 !Filesystem::fileWritable( m_pPathEdit->text(), true ) &&
-		 !( action & Action::SaveAs ) ) {
+		!Filesystem::fileWritable( m_pPathEdit->text(), true ) &&
+		!( action & Action::SaveAs ) ) {
 		// Read-only artifact
 		QString sToolTip = pCommonStrings->getArtifactIsReadOnly();
 
-		m_pPathEdit->setIsActive( false );
-		m_pPatternNameTxt->setIsActive( false );
-		m_pVersionSpinBox->setIsActive( false );
-		m_pAuthorTxt->setIsActive( false );
-		m_pLicenseComboBox->setIsActive( false );
-		m_pLicenseStringTxt->setIsActive( false );
-		m_pPatternDescTxt->setIsActive( false );
-		m_pTagEdit->setEnabled( false );
-		m_pOkBtn->setIsActive( false );
-		m_pPathBrowseButton->setIsActive( false );
+	m_pPathEdit->setIsActive( false );
+	m_pPatternNameTxt->setIsActive( false );
+	m_pVersionSpinBox->setIsActive( false );
+	m_pAuthorTxt->setIsActive( false );
+	m_pLicenseComboBox->setIsActive( false );
+	m_pLicenseStringTxt->setIsActive( false );
+	m_pPatternDescTxt->setIsActive( false );
+	m_pTagEdit->setEnabled( false );
+	m_pGenerativeSwapCheckBox->setEnabled( false );
+	m_pOkBtn->setIsActive( false );
+	m_pPathBrowseButton->setIsActive( false );
 
-		m_pPathEdit->setToolTip( sToolTip );
-		m_pPatternNameTxt->setToolTip( sToolTip );
-		m_pVersionSpinBox->setToolTip( sToolTip );
-		m_pAuthorTxt->setToolTip( sToolTip );
-		m_pLicenseComboBox->setToolTip( sToolTip );
-		m_pLicenseStringTxt->setToolTip( sToolTip );
-		m_pPatternDescTxt->setToolTip( sToolTip );
-		m_pTagEdit->setToolTip( sToolTip );
-		m_pOkBtn->setToolTip( sToolTip );
-		m_pPathBrowseButton->setToolTip( sToolTip );
+	m_pPathEdit->setToolTip( sToolTip );
+	m_pPatternNameTxt->setToolTip( sToolTip );
+	m_pVersionSpinBox->setToolTip( sToolTip );
+	m_pAuthorTxt->setToolTip( sToolTip );
+	m_pLicenseComboBox->setToolTip( sToolTip );
+	m_pLicenseStringTxt->setToolTip( sToolTip );
+	m_pPatternDescTxt->setToolTip( sToolTip );
+	m_pTagEdit->setToolTip( sToolTip );
+	m_pGenerativeSwapCheckBox->setToolTip( sToolTip );
+	m_pOkBtn->setToolTip( sToolTip );
+	m_pPathBrowseButton->setToolTip( sToolTip );
 
-		// Rather dirty fix to align the design of the QTextEdit to
-		// the coloring of our custom QLineEdits.
-		m_pPatternDescTxt->setStyleSheet(
-			QString( "\
+	// Rather dirty fix to align the design of the QTextEdit to
+	// the coloring of our custom QLineEdits.
+	m_pPatternDescTxt->setStyleSheet(
+		QString( "\
 QTextEdit { \
-    color: %1; \
-    background-color: %2; \
-}" )
-				.arg( pPref->getColorTheme()->m_windowTextColor.name() )
-				.arg( pPref->getColorTheme()->m_windowColor.name() )
-		);
-	}
-
-	auto styleButton = [&]( Button* pButton ) {
-		pButton->setFixedFontSize( 12 );
-		pButton->setSize( QSize( 70, 23 ) );
-		pButton->setBorderRadius( 3 );
-		pButton->setType( Button::Type::Push );
-	};
-
-	styleButton( m_pOkBtn );
-	m_pOkBtn->setText( pCommonStrings->getButtonOk() );
-	styleButton( m_pCancelBtn );
-	m_pCancelBtn->setText( pCommonStrings->getButtonCancel() );
-	styleButton( m_pPathBrowseButton );
-	m_pPathBrowseButton->setText( pCommonStrings->getButtonBrowse() );
-
-	// Explicit button connections (previously auto-connected by setupUi)
-	connect( m_pOkBtn, SIGNAL( clicked() ), this, SLOT( on_okBtn_clicked() ) );
-	connect(
-		m_pCancelBtn, SIGNAL( clicked() ), this, SLOT( on_cancelBtn_clicked() )
+color: %1; \
+background-color: %2; \
+		}" )
+		.arg( pPref->getColorTheme()->m_windowTextColor.name() )
+		.arg( pPref->getColorTheme()->m_windowColor.name() )
 	);
-	connect( m_pPathBrowseButton, &QPushButton::clicked, [&]() {
-		const QString sPath = m_pPathEdit->text();
-		QFileInfo info( sPath );
-		QString sDir = info.absoluteDir().absolutePath();
-		if ( sDir.isEmpty() || !Filesystem::dirWritable( sDir, false ) ) {
-			sDir = Filesystem::userDataPath();
 		}
 
-		FileDialog fd( this );
+		auto styleButton = [&]( Button* pButton ) {
+			pButton->setFixedFontSize( 12 );
+			pButton->setSize( QSize( 70, 23 ) );
+			pButton->setBorderRadius( 3 );
+			pButton->setType( Button::Type::Push );
+		};
 
-		fd.setFileMode( QFileDialog::AnyFile );
-		fd.setNameFilter( Filesystem::sPatternFilter );
-		fd.setDirectory( sDir );
-		fd.setWindowTitle( windowTitle() );
-		fd.setAcceptMode( QFileDialog::AcceptSave );
-		fd.selectFile( info.fileName() );
+		styleButton( m_pOkBtn );
+		m_pOkBtn->setText( pCommonStrings->getButtonOk() );
+		styleButton( m_pCancelBtn );
+		m_pCancelBtn->setText( pCommonStrings->getButtonCancel() );
+		styleButton( m_pPathBrowseButton );
+		m_pPathBrowseButton->setText( pCommonStrings->getButtonBrowse() );
 
-		if ( fd.exec() != QDialog::Accepted ) {
-			return;
-		}
+		// Explicit button connections (previously auto-connected by setupUi)
+		connect( m_pOkBtn, SIGNAL( clicked() ), this, SLOT( on_okBtn_clicked() ) );
+		connect(
+			m_pCancelBtn, SIGNAL( clicked() ), this, SLOT( on_cancelBtn_clicked() )
+		);
+		connect( m_pPathBrowseButton, &QPushButton::clicked, [&]() {
+			const QString sPath = m_pPathEdit->text();
+			QFileInfo info( sPath );
+			QString sDir = info.absoluteDir().absolutePath();
+			if ( sDir.isEmpty() || !Filesystem::dirWritable( sDir, false ) ) {
+				sDir = Filesystem::userDataPath();
+			}
 
-		QString sFilePath = fd.selectedFiles().first();
-		if ( sFilePath.isEmpty() ) {
-			return;
-		}
+			FileDialog fd( this );
 
-		if ( sFilePath.endsWith( Filesystem::sPatternSuffix ) == false ) {
-			sFilePath += Filesystem::sPatternSuffix;
-		}
+			fd.setFileMode( QFileDialog::AnyFile );
+			fd.setNameFilter( Filesystem::sPatternFilter );
+			fd.setDirectory( sDir );
+			fd.setWindowTitle( windowTitle() );
+			fd.setAcceptMode( QFileDialog::AcceptSave );
+			fd.selectFile( info.fileName() );
 
-		m_pPathEdit->setText( sFilePath );
-	} );
+			if ( fd.exec() != QDialog::Accepted ) {
+				return;
+			}
+
+			QString sFilePath = fd.selectedFiles().first();
+			if ( sFilePath.isEmpty() ) {
+				return;
+			}
+
+			if ( sFilePath.endsWith( Filesystem::sPatternSuffix ) == false ) {
+				sFilePath += Filesystem::sPatternSuffix;
+			}
+
+			m_pPathEdit->setText( sFilePath );
+		} );
 }
 
 PatternPropertiesDialog::~PatternPropertiesDialog()
@@ -392,12 +404,12 @@ void PatternPropertiesDialog::licenseComboBoxChanged( int )
 	) );
 
 	if ( m_pLicenseComboBox->currentIndex() ==
-		 static_cast<int>( License::Unspecified ) ) {
+		static_cast<int>( License::Unspecified ) ) {
 		m_pLicenseStringTxt->hide();
-	}
-	else {
-		m_pLicenseStringTxt->show();
-	}
+		}
+		else {
+			m_pLicenseStringTxt->show();
+		}
 }
 
 void PatternPropertiesDialog::on_cancelBtn_clicked()
@@ -413,13 +425,14 @@ void PatternPropertiesDialog::on_okBtn_clicked()
 	QString sPattName = m_pPatternNameTxt->text();
 	QString sNewLicenseString( m_pLicenseStringTxt->text() );
 	if ( m_pLicenseComboBox->currentIndex() ==
-		 static_cast<int>(License::Unspecified) ) {
+		static_cast<int>(License::Unspecified) ) {
 		sNewLicenseString = "";
-	}
-	License license( sNewLicenseString );
+		}
+		License license( sNewLicenseString );
 	license.setCopyrightHolder( sAuthor );
 	const QStringList tags = m_pTagEdit->getTags();
 	const QString sPattInfo = m_pPatternDescTxt->toPlainText();
+	const bool bGenerativeSwap = m_pGenerativeSwapCheckBox->isChecked();
 
 	// Sanity checks.
 	//
@@ -427,92 +440,95 @@ void PatternPropertiesDialog::on_okBtn_clicked()
 	// the license types selected in the combo boxes.
 	License licenseCheck( m_pLicenseStringTxt->text() );
 	if ( static_cast<int>( licenseCheck.getType() ) !=
-		 m_pLicenseComboBox->currentIndex() ) {
+		m_pLicenseComboBox->currentIndex() ) {
 		if ( QMessageBox::warning(
-				 this, "Hydrogen",
-				 pCommonStrings->getLicenseMismatchingUserInput(),
-				 QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel
-			 ) == QMessageBox::Cancel ) {
+			this, "Hydrogen",
+			pCommonStrings->getLicenseMismatchingUserInput(),
+								  QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel
+		) == QMessageBox::Cancel ) {
 			WARNINGLOG( QString( "Abort. License string [%1] "
-								 "does not comply to selected License Type [%2]"
+			"does not comply to selected License Type [%2]"
 			)
-							.arg( m_pLicenseStringTxt->text() )
-							.arg( License::LicenseTypeToQString(
-								static_cast<License::LicenseType>(
-									m_pLicenseComboBox->currentIndex()
-								)
-							) ) );
+			.arg( m_pLicenseStringTxt->text() )
+			.arg( License::LicenseTypeToQString(
+				static_cast<License::LicenseType>(
+					m_pLicenseComboBox->currentIndex()
+				)
+			) ) );
 			return;
 		}
-	}
+		}
 
-	if ( ( m_action & Action::SaveAs ) &&
-		 ( m_pPattern->getPath() != m_pPathEdit->text() &&
-		   !m_pPathEdit->text().isEmpty() ) ) {
-		if ( !Filesystem::isPathValid(
-				 Filesystem::Artifact::Pattern, m_pPathEdit->text(), false
-			 ) ) {
-			QMessageBox::critical(
-				this, "Hydrogen",
-				QString( "[%1]\n\n%2" )
+		if ( ( m_action & Action::SaveAs ) &&
+			( m_pPattern->getPath() != m_pPathEdit->text() &&
+			!m_pPathEdit->text().isEmpty() ) ) {
+			if ( !Filesystem::isPathValid(
+				Filesystem::Artifact::Pattern, m_pPathEdit->text(), false
+			) ) {
+				QMessageBox::critical(
+					this, "Hydrogen",
+					QString( "[%1]\n\n%2" )
 					.arg( m_pPathEdit->text() )
 					.arg( pCommonStrings->getErrorInvalidPath() )
-			);
-			return;
-		}
-	}
+				);
+				return;
+			}
+			}
 
-	if ( sPattName.isEmpty() ) {
-		QMessageBox::warning(
-			this, "Hydrogen", pCommonStrings->getErrorEmptyName() );
-		return;
-	}
+			if ( sPattName.isEmpty() ) {
+				QMessageBox::warning(
+					this, "Hydrogen", pCommonStrings->getErrorEmptyName() );
+				return;
+			}
 
-	if ( ( m_action & Action::ModifyViaUndo ) &&
-		 ( ! ( m_action & Action::Duplicate ) ) &&
-		 ( m_pPattern->getPath() != m_pPathEdit->text() ||
-		   m_pPattern->getVersion() != nVersion ||
-		   m_pPattern->getName() != sPattName ||
-		   m_pPattern->getAuthor() != sAuthor ||
-		   m_pPattern->getInfo() != sPattInfo ||
-		   m_pPattern->getLicense() != license ||
-		   m_pPattern->getTags() != tags ) ) {
+			if ( ( m_action & Action::ModifyViaUndo ) &&
+				( ! ( m_action & Action::Duplicate ) ) &&
+				( m_pPattern->getPath() != m_pPathEdit->text() ||
+				m_pPattern->getVersion() != nVersion ||
+				m_pPattern->getName() != sPattName ||
+				m_pPattern->getAuthor() != sAuthor ||
+				m_pPattern->getInfo() != sPattInfo ||
+				m_pPattern->getLicense() != license ||
+				m_pPattern->getTags() != tags ||
+				m_pPattern->getGenerativeSwap() != bGenerativeSwap ) ) {
 
-		// Within the current song we need to take extra care for the current
-		// song to have an unique name.
-		auto pPatternList =
-			Hydrogen::get_instance()->getSong()->getPatternList();
-		sPattName = pPatternList->findUnusedPatternName(
-			sPattName, m_nSelectedPattern
-		);
+				// Within the current song we need to take extra care for the current
+				// song to have an unique name.
+				auto pPatternList =
+				Hydrogen::get_instance()->getSong()->getPatternList();
+				sPattName = pPatternList->findUnusedPatternName(
+					sPattName, m_nSelectedPattern
+				);
 
-		SE_modifyPatternPropertiesAction* action =
-			new SE_modifyPatternPropertiesAction(
-				m_pPattern->getPath(), m_pPattern->getVersion(),
-				m_pPattern->getName(), m_pPattern->getAuthor(),
-				m_pPattern->getInfo(), m_pPattern->getLicense(),
-				m_pPattern->getTags(), m_pPathEdit->text(), nVersion, sPattName,
-				sAuthor, sPattInfo, license, tags, m_nSelectedPattern
-			);
-		HydrogenApp::get_instance()->pushUndoCommand( action );
-	}
+				SE_modifyPatternPropertiesAction* action =
+				new SE_modifyPatternPropertiesAction(
+					m_pPattern->getPath(), m_pPattern->getVersion(),
+													 m_pPattern->getName(), m_pPattern->getAuthor(),
+													 m_pPattern->getInfo(), m_pPattern->getLicense(),
+													 m_pPattern->getTags(), m_pPathEdit->text(), nVersion, sPattName,
+													 sAuthor, sPattInfo, license, tags, m_nSelectedPattern
+				);
+				HydrogenApp::get_instance()->pushUndoCommand( action );
+				}
 
-	if ( ( m_action & Action::SaveAs ) &&
-		 m_pPattern->getPath() != m_pPathEdit->text() ) {
-		m_pPattern->setPath( m_pPathEdit->text() );
-	}
-	if ( m_pPattern->getVersion() != nVersion ) {
-		m_pPattern->setVersion( nVersion );
-	}
-	m_pPattern->setName( sPattName );
-	m_pPattern->setAuthor( sAuthor );
-	m_pPattern->setInfo( sPattInfo );
-	// Only update the license in case it changed (in order to not
-	// overwrite an attribution).
-	if ( m_pPattern->getLicense() != license ) {
-		m_pPattern->setLicense( license );
-	}
-	m_pPattern->setTags( tags );
+				if ( ( m_action & Action::SaveAs ) &&
+					m_pPattern->getPath() != m_pPathEdit->text() ) {
+					m_pPattern->setPath( m_pPathEdit->text() );
+					}
+					if ( m_pPattern->getVersion() != nVersion ) {
+						m_pPattern->setVersion( nVersion );
+					}
+					m_pPattern->setName( sPattName );
+				m_pPattern->setAuthor( sAuthor );
+				m_pPattern->setInfo( sPattInfo );
+				// Only update the license in case it changed (in order to not
+				// overwrite an attribution).
+				if ( m_pPattern->getLicense() != license ) {
+					m_pPattern->setLicense( license );
+				}
+				m_pPattern->setTags( tags );
+				m_pPattern->setGenerativeSwap( bGenerativeSwap );
+				m_pPattern->setIsModified( true );
 
-	accept();
+				accept();
 }

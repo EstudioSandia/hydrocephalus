@@ -32,6 +32,7 @@
 #include <core/Object.h>
 
 class Button;
+class QCheckBox;
 class LCDCombo;
 class LCDDisplay;
 class LCDSpinBox;
@@ -39,18 +40,18 @@ class LCDTextEdit;
 class TagEdit;
 
 namespace H2Core {
-class Pattern;
+	class Pattern;
 }
 
 /** \ingroup docGUI*/
 class PatternPropertiesDialog : public QDialog,
-								protected WidgetWithLicenseProperty,
-								public H2Core::Object<PatternPropertiesDialog>
+protected WidgetWithLicenseProperty,
+public H2Core::Object<PatternPropertiesDialog>
 
 {
 	H2_OBJECT( PatternPropertiesDialog )
 	Q_OBJECT
-   public:
+public:
 	enum Action {
 		/** With no additional actions, the window title suggests a change of
 		 * properties and content changed will the written to the provided
@@ -77,12 +78,12 @@ class PatternPropertiesDialog : public QDialog,
 
 	~PatternPropertiesDialog();
 
-   private slots:
+private slots:
 	void on_cancelBtn_clicked();
 	void on_okBtn_clicked();
 	void licenseComboBoxChanged( int );
 
-   private:
+private:
 	std::shared_ptr<H2Core::Pattern> m_pPattern;
 	int m_nSelectedPattern;
 	Action m_action;
@@ -98,6 +99,7 @@ class PatternPropertiesDialog : public QDialog,
 	Button* m_pOkBtn;
 	Button* m_pCancelBtn;
 	Button* m_pPathBrowseButton;
+	QCheckBox* m_pGenerativeSwapCheckBox;
 };
 
 #endif

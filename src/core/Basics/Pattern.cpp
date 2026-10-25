@@ -482,15 +482,25 @@ namespace H2Core
 		}
 
 		if ( !candidates.empty() && pPatternList != nullptr ) {
-			// Randomly select ONLY ONE pattern from the pool
-			int randomIndex = rand() % candidates.size();
-			auto chosenPattern = candidates[randomIndex];
+			if ( H2Core::Hydrogen::get_instance()->getGenerativeSwapMode() ) {
+				// --- GENERATIVE SWAP MODE ---
+				// Randomly select ONLY ONE pattern from the pool
+				int randomIndex = rand() % candidates.size();
+				auto chosenPattern = candidates[randomIndex];
 
-			std::cout << "[HYDROCEPHALUS DEBUG] Rolled index " << randomIndex
-			<< " -> Chosen Pattern: " << chosenPattern->getName().toStdString() << std::endl;
+				std::cout << "[HYDROCEPHALUS DEBUG] Generative Swap Active! Rolled index " << randomIndex
+				<< " -> Chosen Pattern: " << chosenPattern->getName().toStdString() << std::endl;
 
-			// Inject the single chosen pattern directly into the active playback list!
-			pPatternList->add( chosenPattern, true );
+				// Inject the single chosen pattern directly into the active playback list!
+				pPatternList->add( chosenPattern, true );
+			}
+			else {
+				// --- TRADITIONAL STACKED MODE ---
+				// Add all sub-patterns simultaneously
+				for ( const auto& pPat : candidates ) {
+					pPatternList->add( pPat, true );
+				}
+			}
 		}
 	}
 

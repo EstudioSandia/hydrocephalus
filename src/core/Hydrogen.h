@@ -47,133 +47,133 @@ namespace H2Core
 	class SoundLibraryDatabase;
 	class TimeHelper;
 
-///
-/// Hydrogen Audio Engine.
-///
-/** \ingroup docCore*/
-class Hydrogen : public H2Core::Object<Hydrogen>
-{
-	H2_OBJECT(Hydrogen)
-public:
+	///
+	/// Hydrogen Audio Engine.
+	///
+	/** \ingroup docCore*/
+	class Hydrogen : public H2Core::Object<Hydrogen>
+	{
+		H2_OBJECT(Hydrogen)
+	public:
 
-	/** If the new tap tempo interval results in a tempo deviating more than
-	 * this value from the current average, the average will be reset to the
-	 * newest tempo. */
-	static constexpr int nTapTempoMaxDiff = 20;
-	
-	/** Specifies where the #AudioEngine does get its current tempo
-		updates from.*/
-	enum class Tempo {
-		/** BeatCounter, TapTempo, OSC and MIDI commands as well as
-			the BPM widget in the MainToolBar are used to change the
-			tempo.*/
-		Song = 0,
-		/** Only tempo markers on the Timeline are considered.*/
-		Timeline = 1,
-		/** Hydrogen is synchronizing tempo and transport handling - like start,
-		 * stop, and relocation - to incoming MIDI (clock) events. This will
-		 * only work, if there is _no_ external JACK Timebase controller
-		 * present. */
-		Midi = 2,
-		/** Hydrogen will disregard all internal tempo settings and uses the
-			ones provided by the JACK server instead. This mode is only used in
-			case the JACK audio driver is used, JACK Timebase support is
-			activated in the Preferences, and an external Timebase controller is
-			registered to the JACK server.*/
-		Jack = 3
-	};
+		/** If the new tap tempo interval results in a tempo deviating more than
+		 * this value from the current average, the average will be reset to the
+		 * newest tempo. */
+		static constexpr int nTapTempoMaxDiff = 20;
 
-	enum ErrorMessages {
-		/**
-		 * The provided input in createDriver() does not match any of the
-		 * choices for #H2Core::Preferences::AudioDriver.
-		 */
-		UNKNOWN_DRIVER,
-		/**
-		 * Unable to connect the audio driver stored. The NullDriver will be
-		 * used as a fallback instead.
-		 */
-		ERROR_STARTING_DRIVER,
-		JACK_SERVER_SHUTDOWN,
-		JACK_CANNOT_ACTIVATE_CLIENT,
-		/** Can't connect the main audio output ports to the default. */
-		JACK_CANNOT_CONNECT_OUTPUT_PORT,
-		/** Our JACK client can not be disconnected from the JACK server. */
-		JACK_CANNOT_CLOSE_CLIENT,
-		/** Can't register either audio or MIDI ports for our JACK client. */
-		JACK_ERROR_IN_PORT_REGISTER,
-		/**
-		 * Unable to start the OSC server with the given
-		 * port number.
-		 */
-		OSC_CANNOT_CONNECT_TO_PORT,
-		PLAYBACK_TRACK_INVALID
-	};
+		/** Specifies where the #AudioEngine does get its current tempo
+		 upda*tes from.*/
+		enum class Tempo {
+			/** BeatCounter, TapTempo, OSC and MIDI commands as well as
+			 t he* BPM widget in the MainToolBar are used to change the
+			 tempo.*/
+			Song = 0,
+			/** Only tempo markers on the Timeline are considered.*/
+			Timeline = 1,
+			/** Hydrogen is synchronizing tempo and transport handling - like start,
+			 * stop, and relocation - to incoming MIDI (clock) events. This will
+			 * only work, if there is _no_ external JACK Timebase controller
+			 * present. */
+			Midi = 2,
+			/** Hydrogen will disregard all internal tempo settings and uses the
+			 o ne*s provided by the JACK server instead. This mode is only used in
+			 case the JACK audio driver is used, JACK Timebase support is
+			 activated in the Preferences, and an external Timebase controller is
+			 registered to the JACK server.*/
+			Jack = 3
+		};
 
-	/** Specifies the state of the Qt GUI*/
-	enum class GUIState {
-		/** Hydrogen is still starting up. Core maybe already somewhat ready but
-		 * GUI is most probably not.*/
-		startup = -1,
-		/** Hydrogen is up and running but there is no GUI available. */
-		headless = 0,
-		/** Hydrogen is up and running and there is a working GUI. */
-		ready = 1,
-		/** Teardown of Hydrogen was initialized and the Event handling system
-		 * might not work anymore. */
-		shutdown
-	};
+		enum ErrorMessages {
+			/**
+			 * The provided input in createDriver() does not match any of the
+			 * choices for #H2Core::Preferences::AudioDriver.
+			 */
+			UNKNOWN_DRIVER,
+			/**
+			 * Unable to connect the audio driver stored. The NullDriver will be
+			 * used as a fallback instead.
+			 */
+			ERROR_STARTING_DRIVER,
+			JACK_SERVER_SHUTDOWN,
+			JACK_CANNOT_ACTIVATE_CLIENT,
+			/** Can't connect the main audio output ports to the default. */
+			JACK_CANNOT_CONNECT_OUTPUT_PORT,
+			/** Our JACK client can not be disconnected from the JACK server. */
+			JACK_CANNOT_CLOSE_CLIENT,
+			/** Can't register either audio or MIDI ports for our JACK client. */
+			JACK_ERROR_IN_PORT_REGISTER,
+			/**
+			 * Unable to start the OSC server with the given
+			 * port number.
+			 */
+			OSC_CANNOT_CONNECT_TO_PORT,
+			PLAYBACK_TRACK_INVALID
+		};
+
+		/** Specifies the state of the Qt GUI*/
+		enum class GUIState {
+			/** Hydrogen is still starting up. Core maybe already somewhat ready but
+			 * GUI is most probably not.*/
+			startup = -1,
+			/** Hydrogen is up and running but there is no GUI available. */
+			headless = 0,
+			/** Hydrogen is up and running and there is a working GUI. */
+			ready = 1,
+			/** Teardown of Hydrogen was initialized and the Event handling system
+			 * might not work anymore. */
+			shutdown
+		};
 		static QString GUIStateToQString( const GUIState& state );
 
-	/**
-	 * Creates all the instances used within Hydrogen in the right
-	 * order.
-	 */
-	static void		create_instance( int nOscPort );
-	/**
-	 * Returns the current Hydrogen instance #__instance.
-	 */
-	static Hydrogen*	get_instance(){ return __instance; };
+		/**
+		 * Creates all the instances used within Hydrogen in the right
+		 * order.
+		 */
+		static void		create_instance( int nOscPort );
+		/**
+		 * Returns the current Hydrogen instance #__instance.
+		 */
+		static Hydrogen*	get_instance(){ return __instance; };
 
-	/**
-	 * Destructor taking care of most of the clean up.
-	 */
-	~Hydrogen();
+		/**
+		 * Destructor taking care of most of the clean up.
+		 */
+		~Hydrogen();
 
-	/*
-	 * return central instance of the audio engine
-	 */
-	AudioEngine*		getAudioEngine() const;
+		/*
+		 * return central instance of the audio engine
+		 */
+		AudioEngine*		getAudioEngine() const;
 		std::shared_ptr<MidiActionManager> getMidiActionManager() const;
-	std::shared_ptr<SoundLibraryDatabase> getSoundLibraryDatabase() const {
-		return m_pSoundLibraryDatabase;
-	}
-	std::shared_ptr<Playlist> getPlaylist() const;
-	void setPlaylist( std::shared_ptr<Playlist> pPlaylist );
+		std::shared_ptr<SoundLibraryDatabase> getSoundLibraryDatabase() const {
+			return m_pSoundLibraryDatabase;
+		}
+		std::shared_ptr<Playlist> getPlaylist() const;
+		void setPlaylist( std::shared_ptr<Playlist> pPlaylist );
 		std::shared_ptr<TimeHelper> getTimeHelper() const;
 
-// ***** SEQUENCER ********
-	/// Start the internal sequencer
-	void			sequencerPlay();
+		// ***** SEQUENCER ********
+		/// Start the internal sequencer
+		void			sequencerPlay();
 
-	/// Stop the internal sequencer
-	void			sequencerStop();
+		/// Stop the internal sequencer
+		void			sequencerStop();
 
-	/// Last received midi message
-	const MidiEvent::Type& getLastMidiEvent() const;
-	void setLastMidiEvent( const MidiEvent::Type& type );
-	Midi::Parameter getLastMidiEventParameter() const;
-	void setLastMidiEventParameter( Midi::Parameter parameter );
+		/// Last received midi message
+		const MidiEvent::Type& getLastMidiEvent() const;
+		void setLastMidiEvent( const MidiEvent::Type& type );
+		Midi::Parameter getLastMidiEventParameter() const;
+		void setLastMidiEventParameter( Midi::Parameter parameter );
 
-	/** Wrapper around AudioEngine::toggleNextPattern().*/
-	void			toggleNextPattern( int nPatternNumber );
-	/** Wrapper around AudioEngine::flushAndAddNextPattern().*/
-	bool			flushAndAddNextPattern( int nPatternNumber );
-	
+		/** Wrapper around AudioEngine::toggleNextPattern().*/
+		void			toggleNextPattern( int nPatternNumber );
+		/** Wrapper around AudioEngine::flushAndAddNextPattern().*/
+		bool			flushAndAddNextPattern( int nPatternNumber );
+
 		/**
 		 * Get the current song.
 		 * \return #m_pSong
-		 */ 	
+		 */
 		std::shared_ptr<Song>			getSong() const{ return m_pSong; }
 		/**
 		 * Sets the current song #m_pSong to @a pNewSong.
@@ -181,243 +181,246 @@ public:
 		 */
 		void			setSong( std::shared_ptr<Song> pNewSong );
 
-	/**
-	 * Find a PatternList/column corresponding to the supplied tick
-	 * position @a nTick.
-	 *
-	 * Adds up the lengths of all pattern columns until @a nTick lies in
-	 * between the bounds of a Pattern.
-	 *
-	 * \param nTick Position in ticks.
-	 * \param bLoopMode Whether looping is enabled in the Song, see
-	 *   Song::is_loop_enabled(). If true, @a nTick is allowed to be
-	 *   larger than the total length of the Song.
-	 * \param pPatternStartTick Pointer to an integer the beginning of the
-	 *   found pattern list will be stored in (in ticks).
-	 * \return
-	 *   - -1 : pattern list couldn't be found.
-	 *   - >=0 : PatternList index in Song::__pattern_group_sequence.
-	 */
-	int			getColumnForTick( long nTick, bool bLoopMode, long* pPatternStartTick ) const;
-	/**
-	 * Get the total number of ticks passed up to a @a nColumn /
-	 * pattern group.
-	 *
-	 * The AudioEngine should be LOCKED when calling this!
-	 *
-	 * \param nColumn pattern group.
-	 * \return
-	 *  - -1 : if @a nColumn is bigger than the number of patterns in
-	 *   the Song and Song::isLoopEnabled() is set to false or
-	 *   no Patterns could be found at all.
-	 *  - >= 0 : the total number of ticks passed.
-	 */
-	long			getTickForColumn( int nColumn ) const;
+		/**
+		 * Find a PatternList/column corresponding to the supplied tick
+		 * position @a nTick.
+		 *
+		 * Adds up the lengths of all pattern columns until @a nTick lies in
+		 * between the bounds of a Pattern.
+		 *
+		 * \param nTick Position in ticks.
+		 * \param bLoopMode Whether looping is enabled in the Song, see
+		 *   Song::is_loop_enabled(). If true, @a nTick is allowed to be
+		 *   larger than the total length of the Song.
+		 * \param pPatternStartTick Pointer to an integer the beginning of the
+		 *   found pattern list will be stored in (in ticks).
+		 * \return
+		 *   - -1 : pattern list couldn't be found.
+		 *   - >=0 : PatternList index in Song::__pattern_group_sequence.
+		 */
+		int			getColumnForTick( long nTick, bool bLoopMode, long* pPatternStartTick ) const;
+		/**
+		 * Get the total number of ticks passed up to a @a nColumn /
+		 * pattern group.
+		 *
+		 * The AudioEngine should be LOCKED when calling this!
+		 *
+		 * \param nColumn pattern group.
+		 * \return
+		 *  - -1 : if @a nColumn is bigger than the number of patterns in
+		 *   the Song and Song::isLoopEnabled() is set to false or
+		 *   no Patterns could be found at all.
+		 *  - >= 0 : the total number of ticks passed.
+		 */
+		long			getTickForColumn( int nColumn ) const;
 
-	Song::Mode getMode() const;
-	/** Wrapper around Song::setMode() which also triggers
-	Event::Type::SongModeActivation and should be used by all parts of the
-	code except for song reading/setting.*/
-	void setMode( const Song::Mode& mode, Event::Trigger trigger );
-	
-	Song::ActionMode getActionMode() const;
-	/** Wrapper around Song::setActionMode() which also triggers
-	Event::Type::ActionModeChanged and should be used by all parts of the
-	code except for song reading/setting.*/
-	void setActionMode( const Song::ActionMode& mode );
+		Song::Mode getMode() const;
+		/** Wrapper around Song::setMode() which also triggers
+		 E vent*::Type::SongModeActivation and should be used by all parts of the
+		 code except for song reading/setting.*/
+		void setMode( const Song::Mode& mode, Event::Trigger trigger );
 
-	Song::PatternMode getPatternMode() const;
-	/** Wrapper around Song::setPatternMode() which also triggers
-	Event::Type::StackedModeActivation and should be used by all parts of the
-	code except for song reading/setting.*/
-	void setPatternMode( const Song::PatternMode& mode );
+		Song::ActionMode getActionMode() const;
+		/** Wrapper around Song::setActionMode() which also triggers
+		 E vent*::Type::ActionModeChanged and should be used by all parts of the
+		 code except for song reading/setting.*/
+		void setActionMode( const Song::ActionMode& mode );
 
-	/** Wrapper around both Song::setIsTimelineActivated (recent) and
-	Preferences::setUseTimelinebpm() (former place to store the
-	variable but kept to maintain backward compatibility) which also
-	triggers Event::Type::TimelineActivation.*/
-	void setIsTimelineActivated( bool bEnabled );
+		Song::PatternMode getPatternMode() const;
+		/** Wrapper around Song::setPatternMode() which also triggers
+		 E vent*::Type::StackedModeActivation and should be used by all parts of the
+		 code except for song reading/setting.*/
+		void setPatternMode( const Song::PatternMode& mode );
 
-	void updateSongSize();
+		/** Wrapper around both Song::setIsTimelineActivated (recent) and
+		 P refe*rences::setUseTimelinebpm() (former place to store the
+		 variable but kept to maintain backward compatibility) which also
+		 triggers Event::Type::TimelineActivation.*/
+		void setIsTimelineActivated( bool bEnabled );
 
-	bool addRealtimeNote(
-		int instrument,
-		float velocity,
-		bool noteoff = false,
-		Midi::Note note = Midi::NoteDefault
-	);
+		void updateSongSize();
 
-	Midi::Parameter getHihatOpenness() const;
-	void setHihatOpenness( Midi::Parameter openness );
+		bool addRealtimeNote(
+			int instrument,
+			float velocity,
+			bool noteoff = false,
+			Midi::Note note = Midi::NoteDefault
+		);
 
-	void restartAudioDriver();
-	void restartMidiDriver();
+		Midi::Parameter getHihatOpenness() const;
+		void setHihatOpenness( Midi::Parameter openness );
 
-	std::shared_ptr<AudioDriver> getAudioDriver() const;
-	std::shared_ptr<MidiBaseDriver> getMidiDriver() const;
+		void restartAudioDriver();
+		void restartMidiDriver();
 
-	/** Sets the state of the current drumkit - the one contained in #m_pSong -
-	 * to @a bIsModified.
-	 *
-	 * Use this wrapper function instead of Drumkit::setIsModified() since it
-	 * ensures the modification state of the enclosing song is set as well. */
-	void setDrumkitModified( bool bIsModified );
-	/** Sets the state of a pattern contained in #m_pSong to @a bIsModified.
-	 *
-	 * Use this wrapper function instead of Pattern::setIsModified() since it
-	 * ensures the modification state of the enclosing song is set as well. */
-	void setPatternModified( bool bIsModified, int nIndex );
-	/** Wrapper around Song::setIsModified() that checks whether a
-		song is set.*/
-	void setSongModified( bool bIsModified );
-	/** Wrapper around Song::getIsModified() that checks whether a
-		song is set.*/
-	bool getSongModified() const;
+		std::shared_ptr<AudioDriver> getAudioDriver() const;
+		std::shared_ptr<MidiBaseDriver> getMidiDriver() const;
 
-	void			onTapTempoAccelEvent( TimePoint start = TimePoint() );
+		/** Sets the state of the current drumkit - the one contained in #m_pSong -
+		 * to @a bIsModified.
+		 *
+		 * Use this wrapper function instead of Drumkit::setIsModified() since it
+		 * ensures the modification state of the enclosing song is set as well. */
+		void setDrumkitModified( bool bIsModified );
+		/** Sets the state of a pattern contained in #m_pSong to @a bIsModified.
+		 *
+		 * Use this wrapper function instead of Pattern::setIsModified() since it
+		 * ensures the modification state of the enclosing song is set as well. */
+		void setPatternModified( bool bIsModified, int nIndex );
+		/** Wrapper around Song::setIsModified() that checks whether a
+		 song* is set.*/
+		void setSongModified( bool bIsModified );
+		/** Wrapper around Song::getIsModified() that checks whether a
+		 song* is set.*/
+		bool getSongModified() const;
 
-	void			restartLadspaFX();
-	/** \return #m_nSelectedPatternNumber*/
-	int				getSelectedPatternNumber() const;
-	/**
-	 * Sets #m_nSelectedPatternNumber.
-	 *
-	 * \param nPat Sets #m_nSelectedPatternNumber
-	 * \param bNeedsLock Whether the function was called with the audio engine
-	 *   locked already or it should do so itself.
-	 * \param trigger How to handle events. Forcing is important when
-	 *   rearranging patterns in the song editor while the pattern editor is
-	 *   locked.
-	 */
-	void setSelectedPatternNumber( int nPat,
-								   bool bNeedsLock = true,
-								   Event::Trigger trigger = Event::Trigger::Default );
+		void			onTapTempoAccelEvent( TimePoint start = TimePoint() );
 
-	/**
-	 * Updates the selected pattern to the one recorded note will be
-	 * inserted to.
-	 */
-	void updateSelectedPattern( bool bNeedsLock = true );
+		void			restartLadspaFX();
+		/** \return #m_nSelectedPatternNumber*/
+		int				getSelectedPatternNumber() const;
+		/**
+		 * Sets #m_nSelectedPatternNumber.
+		 *
+		 * \param nPat Sets #m_nSelectedPatternNumber
+		 * \param bNeedsLock Whether the function was called with the audio engine
+		 *   locked already or it should do so itself.
+		 * \param trigger How to handle events. Forcing is important when
+		 *   rearranging patterns in the song editor while the pattern editor is
+		 *   locked.
+		 */
+		void setSelectedPatternNumber( int nPat,
+									   bool bNeedsLock = true,
+									   Event::Trigger trigger = Event::Trigger::Default );
 
-	int				getSelectedInstrumentNumber() const;
-	/**
-	 * \param nInstrument #Instrument about to be selected
-	 * \param trigger How to handle events.
-	 */
-	void			setSelectedInstrumentNumber(
-		int nInstrument, Event::Trigger trigger = Event::Trigger::Default );
-	std::shared_ptr<Instrument>		getSelectedInstrument() const;
+		/**
+		 * Updates the selected pattern to the one recorded note will be
+		 * inserted to.
+		 */
+		void updateSelectedPattern( bool bNeedsLock = true );
 
-	void renamePerTrackJackAudioPorts(
-		std::shared_ptr<Song> pSong,
-		std::shared_ptr<Drumkit> pOldDrumkit = nullptr
-	);
+		int				getSelectedInstrumentNumber() const;
+		/**
+		 * \param nInstrument #Instrument about to be selected
+		 * \param trigger How to handle events.
+		 */
+		void			setSelectedInstrumentNumber(
+			int nInstrument, Event::Trigger trigger = Event::Trigger::Default );
+		std::shared_ptr<Instrument>		getSelectedInstrument() const;
 
-	/** Starts/stops the OSC server
-	 * \param bEnable `true` = start, `false` = stop.*/
-	void			toggleOscServer( bool bEnable );
-	/** Destroys and recreates the OscServer singleton in order to
-		adopt a new OSC port.*/
-	void			recreateOscServer();
+		void renamePerTrackJackAudioPorts(
+			std::shared_ptr<Song> pSong,
+			std::shared_ptr<Drumkit> pOldDrumkit = nullptr
+		);
 
-	// beatconter
-	void			setBeatCounterTotalBeats( int nTotalBeats );
-	int			getBeatCounterTotalBeats() const;
-	void			setBeatCounterBeatLength( float fBeatLength );
-	float			getBeatCounterBeatLength() const;
-	int			getBeatCounterEventCount() const;
-	bool			handleBeatCounter( TimePoint start = TimePoint() );
-	void			updateBeatCounterSettings();
+		/** Starts/stops the OSC server
+		 * \param bEnable `true` = start, `false` = stop.*/
+		void			toggleOscServer( bool bEnable );
+		/** Destroys and recreates the OscServer singleton in order to
+		 adop*t a new OSC port.*/
+		void			recreateOscServer();
 
-	void			initJackTimebaseControl();
-	void			releaseJackTimebaseControl();
+		// beatconter
+		void			setBeatCounterTotalBeats( int nTotalBeats );
+		int			getBeatCounterTotalBeats() const;
+		void			setBeatCounterBeatLength( float fBeatLength );
+		float			getBeatCounterBeatLength() const;
+		int			getBeatCounterEventCount() const;
+		bool			handleBeatCounter( TimePoint start = TimePoint() );
+		void			updateBeatCounterSettings();
 
-	void			panic();
+		void			initJackTimebaseControl();
+		void			releaseJackTimebaseControl();
 
-	//export management
-	bool			getIsExportSessionActive() const;
-	/**
-	 * @param nSampleRate sample rate using which to export
-	 * @param nSampleDepth sample depth using which to export
-	 * @param fCompressionLevel Trades off audio quality against compression
-	 *   rate defined between 0.0 (maximum quality) and 1.0 (maximum
-	 *   compression).
-	 *
-	 * \return true on success
-	 * .*/
-	bool			startExportSession( int nSampleRate, int nSampleDepth,
-										double fCompressionLevel = 0.0 );
-	void			stopExportSession();
-	void			startExportSong( const QString& sFileName );
-	void			stopExportSong();
-	
-	/************************************************************/
-	/********************** Playback track **********************/
-	/**
-	 * Wrapper function for loading the playback track.
-	 */
-	void			loadPlaybackTrack( const QString& sFileName );
-	/************************************************************/
+		void			panic();
 
-	/**\return #m_GUIState*/
-	const GUIState&	getGUIState() const;
-	/**\param state Specifies whether the Qt5 GUI is active. Sets
-	   #m_GUIState.*/
-	void			setGUIState( const GUIState& state );
-	bool			hasJackDriver() const;
-	/**
-	 * \return Whether #H2Core::JackDriver is used as current audio driver and
-	 * JACK transport was activated via the GUI
-	 * (#H2Core::Preferences::m_nJackTransportMode).
-	 */
-	bool			hasJackTransport() const;
+		//export management
+		bool			getIsExportSessionActive() const;
+		/**
+		 * @param nSampleRate sample rate using which to export
+		 * @param nSampleDepth sample depth using which to export
+		 * @param fCompressionLevel Trades off audio quality against compression
+		 *   rate defined between 0.0 (maximum quality) and 1.0 (maximum
+		 *   compression).
+		 *
+		 * \return true on success
+		 * .*/
+		bool			startExportSession( int nSampleRate, int nSampleDepth,
+											double fCompressionLevel = 0.0 );
+		void			stopExportSession();
+		void			startExportSong( const QString& sFileName );
+		void			stopExportSong();
 
-	/**
-	 * Convenience function checking whether using the Timeline tempo is set in
-	 * the Preferences, Song::SONG_MODE is set, and there is an external JACK
-	 * Timebase controller (application) present.
-	 *
-	 * \return Whether the Timeline is used to determine the current speed.
-	 */
-	bool isTimelineEnabled() const;
+		/************************************************************/
+		/********************** Playback track **********************/
+		/**
+		 * Wrapper function for loading the playback track.
+		 */
+		void			loadPlaybackTrack( const QString& sFileName );
+		/************************************************************/
 
-	/**
-	 * Convenience function checking whether using the Pattern Editor
-	 * is locked in the song settings and the song is in song mode.
-	 */
-	bool isPatternEditorLocked() const;
-	void setIsPatternEditorLocked( bool bValue );
+		/**\return #m_GUIState*/
+		const GUIState&	getGUIState() const;
+		/**\param state Specifies whether the Qt5 GUI is active. Sets
+		 #m*_GUIState.*/
+		void			setGUIState( const GUIState& state );
+		bool			hasJackDriver() const;
+		/**
+		 * \return Whether #H2Core::JackDriver is used as current audio driver and
+		 * JACK transport was activated via the GUI
+		 * (#H2Core::Preferences::m_nJackTransportMode).
+		 */
+		bool			hasJackTransport() const;
 
-	Tempo getTempoSource() const;
-	
-	/**
-	 * \return Whether we hasJackTransport() and there is an external JACK
-	 *   Timebase controller broadcasting tempo information. If so, we disregard
-	 *   Hydrogen's Timeline information (see
-	 *   #H2Core::JackDriver::m_timebaseState).
-	 */
-	JackDriver::Timebase		getJackTimebaseState() const;
-	/** \return NsmClient::m_bUnderSessionManagement if NSM is
-		supported.*/
-	bool			isUnderSessionManagement() const;
+		/**
+		 * Convenience function checking whether using the Timeline tempo is set in
+		 * the Preferences, Song::SONG_MODE is set, and there is an external JACK
+		 * Timebase controller (application) present.
+		 *
+		 * \return Whether the Timeline is used to determine the current speed.
+		 */
+		bool isTimelineEnabled() const;
+
+		/**
+		 * Convenience function checking whether using the Pattern Editor
+		 * is locked in the song settings and the song is in song mode.
+		 */
+		bool isPatternEditorLocked() const;
+		void setIsPatternEditorLocked( bool bValue );
+
+		Tempo getTempoSource() const;
+
+		/**
+		 * \return Whether we hasJackTransport() and there is an external JACK
+		 *   Timebase controller broadcasting tempo information. If so, we disregard
+		 *   Hydrogen's Timeline information (see
+		 *   #H2Core::JackDriver::m_timebaseState).
+		 */
+		JackDriver::Timebase		getJackTimebaseState() const;
+		/** \return NsmClient::m_bUnderSessionManagement if NSM is
+		 supp*orted.*/
+		bool			isUnderSessionManagement() const;
 
 		bool getRecordEnabled() const;
 		void setRecordEnabled( bool bEnabled );
 
-	void			setSessionIsExported( bool bIsExported );
-	bool			getSessionIsExported() const;
+		bool getGenerativeSwapMode() const;
+		void setGenerativeSwapMode( bool bEnabled );
 
-	/**
-	 * Add @a pInstr to death row.
-	 *
-	 * Since there might still be some notes using @a pInstr left in one of the
-	 * note queues, the instrument's samples must not be unloaded right away
-	 * (the instrumet's destructor might not be called after deleting it since
-	 * it might live on in the undo/redo stack of the GUI). Instead, this
-	 * function will add it to a list of instruments marked for deletion and it
-	 * will be dealt with at a later time (after audio rendering was stopped).
-	 */
-	void addInstrumentToDeathRow( std::shared_ptr<Instrument> pInstr );
+		void			setSessionIsExported( bool bIsExported );
+		bool			getSessionIsExported() const;
+
+		/**
+		 * Add @a pInstr to death row.
+		 *
+		 * Since there might still be some notes using @a pInstr left in one of the
+		 * note queues, the instrument's samples must not be unloaded right away
+		 * (the instrumet's destructor might not be called after deleting it since
+		 * it might live on in the undo/redo stack of the GUI). Instead, this
+		 * function will add it to a list of instruments marked for deletion and it
+		 * will be dealt with at a later time (after audio rendering was stopped).
+		 */
+		void addInstrumentToDeathRow( std::shared_ptr<Instrument> pInstr );
 
 		/** Since we are flushing the samples of the instruments in the death
 		 * row at a delayed point in time (like when stopping transport), we
@@ -425,12 +428,12 @@ public:
 		 * instrument/kits back and forth (like in undo/redo). */
 		void removeInstrumentFromDeathRow( std::shared_ptr<Instrument> pInstr );
 
-	/**
-	 * Processes the patterns added to any virtual ones in the
-	 * #PatternList of the current #Song and ensure both the playing
-	 * pattern representation in the #AudioEngine and the GUI are
-	 * synced.
-	 */
+		/**
+		 * Processes the patterns added to any virtual ones in the
+		 * #PatternList of the current #Song and ensure both the playing
+		 * pattern representation in the #AudioEngine and the GUI are
+		 * synced.
+		 */
 		void updateVirtualPatterns(
 			Event::Trigger trigger = Event::Trigger::Default
 		);
@@ -439,62 +442,62 @@ public:
 		bool getSendBbtChangeEvents() const;
 		void setSendBbtChangeEvents( bool bSend );
 
-	/** Formatted string version for debugging purposes.
-	 * \param sPrefix String prefix which will be added in front of
-	 * every new line
-	 * \param bShort Instead of the whole content of all classes
-	 * stored as members just a single unique identifier will be
-	 * displayed without line breaks.
-	 *
-	 * \return String presentation of current object.*/
-	QString toQString( const QString& sPrefix = "", bool bShort = true ) const override;
+		/** Formatted string version for debugging purposes.
+		 * \param sPrefix String prefix which will be added in front of
+		 * every new line
+		 * \param bShort Instead of the whole content of all classes
+		 * stored as members just a single unique identifier will be
+		 * displayed without line breaks.
+		 *
+		 * \return String presentation of current object.*/
+		QString toQString( const QString& sPrefix = "", bool bShort = true ) const override;
 
-private:
+	private:
 
-	/**
-	 * Constructor, entry point, and initialization of the
-	 * Hydrogen application.
-	 *
-	 * It is called by the main() function after setting up a
-	 * bunch of Qt5 stuff and creating an instance of the Logger
-	 * and Preferences.
-	 *
-	 * Only one Hydrogen object is allowed to exist. If the
-	 * #__instance object is present, the constructor will throw
-	 * an error.
-	 */
-	Hydrogen();
+		/**
+		 * Constructor, entry point, and initialization of the
+		 * Hydrogen application.
+		 *
+		 * It is called by the main() function after setting up a
+		 * bunch of Qt5 stuff and creating an instance of the Logger
+		 * and Preferences.
+		 *
+		 * Only one Hydrogen object is allowed to exist. If the
+		 * #__instance object is present, the constructor will throw
+		 * an error.
+		 */
+		Hydrogen();
 
 		void killInstruments();
 
-	void			midiNoteOn( std::shared_ptr<Note> pNote );
+		void			midiNoteOn( std::shared_ptr<Note> pNote );
 
-	/**
-	 * Static reference to the Hydrogen singleton. 
-	 *
-	 * It is created using the Hydrogen::Hydrogen() constructor,
-	 * initialized with NULL and assigned a new Hydrogen instance
-	 * if still 0 in create_instance().
-	 */
-	static Hydrogen* 	__instance;
+		/**
+		 * Static reference to the Hydrogen singleton.
+		 *
+		 * It is created using the Hydrogen::Hydrogen() constructor,
+		 * initialized with NULL and assigned a new Hydrogen instance
+		 * if still 0 in create_instance().
+		 */
+		static Hydrogen* 	__instance;
 
-	/**
-	 * Pointer to the current song. It is initialized with NULL in
-	 * the Hydrogen() constructor, set via setSong(), and accessed
-	 * via getSong().
-	 */
-	std::shared_ptr<Song>			m_pSong;
+		/**
+		 * Pointer to the current song. It is initialized with NULL in
+		 * the Hydrogen() constructor, set via setSong(), and accessed
+		 * via getSong().
+		 */
+		std::shared_ptr<Song>			m_pSong;
 
-	// beatcounter
-	float			m_fBeatCounterBeatLength;	///< beatcounter note length
-	int			m_nBeatCounterTotalBeats;	///< beatcounter beats to count
-	int			m_nBeatCounterEventCount;		///< beatcounter event
-	int			m_nBeatCounterBeatCount;		///< beatcounter beat to count
-	std::vector<double>			m_beatCounterDiffs;	///< beat diff
+		// beatcounter
+		float			m_fBeatCounterBeatLength;	///< beatcounter note length
+		int			m_nBeatCounterTotalBeats;	///< beatcounter beats to count
+		int			m_nBeatCounterEventCount;		///< beatcounter event
+		int			m_nBeatCounterBeatCount;		///< beatcounter beat to count
+		std::vector<double>			m_beatCounterDiffs;	///< beat diff
 		TimePoint m_lastBeatCounterTimePoint;
-	int			m_nBeatCounterDriftCompensation;		///ms default 0
-	int			m_nBeatCounterStartOffset;		///ms default 0
-	// ~ beatcounter
+		int			m_nBeatCounterDriftCompensation;		///ms default 0
+		int			m_nBeatCounterStartOffset;		///ms default 0
+		// ~ beatcounter
 
 		TimePoint m_lastTapTempoTimePoint;
 		float m_fTapTempoAverageBpm;
@@ -502,166 +505,173 @@ private:
 		 * required to calculate the cumulative average. */
 		long m_nTapTempoEventsAveraged;
 
-	// used for song export
-	Song::Mode		m_oldEngineMode;
-	bool			m_bOldLoopEnabled;
-	bool			m_bExportSessionIsActive;
-	
-	/**
-	 * Specifies whether the Qt5 GUI is active.
-	 *
-	 * When a new Song is set via the core part of Hydrogen, e.g. in
-	 * the context of session management, the std::shared_ptr<Song> must* be set via
-	 * the GUI if active. Else the GUI will freeze.
-	 *
-	 * Set by setGUIState() and accessed via getGUIState().
-	 */
-	GUIState		m_GUIState;
+		// used for song export
+		Song::Mode		m_oldEngineMode;
+		bool			m_bOldLoopEnabled;
+		bool			m_bExportSessionIsActive;
 
-	/** Helper class for time-specific methods. */
-	std::shared_ptr<TimeHelper> m_pTimeHelper;
+		/**
+		 * Specifies whether the Qt5 GUI is active.
+		 *
+		 * When a new Song is set via the core part of Hydrogen, e.g. in
+		 * the context of session management, the std::shared_ptr<Song> must* be set via
+		 * the GUI if active. Else the GUI will freeze.
+		 *
+		 * Set by setGUIState() and accessed via getGUIState().
+		 */
+		GUIState		m_GUIState;
 
-	/// Deleting instruments too soon leads to potential crashes.
-	std::list<std::shared_ptr<Instrument>> 	m_instrumentDeathRow;
-	
-	/**
-	 * Instrument currently focused/selected in the GUI. 
-	 *
-	 * Within the core it is relevant for the MIDI input. Using
-	 * Preferences::m_bPlaySelectedInstrument incoming MIDI signals can be
-	 * used to play back only the selected instrument or the whole
-	 * drumkit.
-	 */
-	int				m_nSelectedInstrumentNumber;
-	/**
-	 * Index of the pattern selected in the GUI or by a MIDI event.
-	 */
-	int				m_nSelectedPatternNumber;
-	/**
-	 * Indicates whether NSM session is saved or exported when entering
-	 * the CoreActionController::saveSong() function.
-	 */
-	bool			m_bSessionIsExported;
+		/** Helper class for time-specific methods. */
+		std::shared_ptr<TimeHelper> m_pTimeHelper;
 
-	/**
-	 * Onset of the recorded last in addRealtimeNote(). It is used to
-	 * determine the custom length of the note in case the note on
-	 * event is followed by a note off event.
-	 */
-	int				m_nLastRecordedMIDINoteTick;
+		/// Deleting instruments too soon leads to potential crashes.
+		std::list<std::shared_ptr<Instrument>> 	m_instrumentDeathRow;
+
+		/**
+		 * Instrument currently focused/selected in the GUI.
+		 *
+		 * Within the core it is relevant for the MIDI input. Using
+		 * Preferences::m_bPlaySelectedInstrument incoming MIDI signals can be
+		 * used to play back only the selected instrument or the whole
+		 * drumkit.
+		 */
+		int				m_nSelectedInstrumentNumber;
+		/**
+		 * Index of the pattern selected in the GUI or by a MIDI event.
+		 */
+		int				m_nSelectedPatternNumber;
+		/**
+		 * Indicates whether NSM session is saved or exported when entering
+		 * the CoreActionController::saveSong() function.
+		 */
+		bool			m_bSessionIsExported;
+
+		/**
+		 * Onset of the recorded last in addRealtimeNote(). It is used to
+		 * determine the custom length of the note in case the note on
+		 * event is followed by a note off event.
+		 */
+		int				m_nLastRecordedMIDINoteTick;
 
 		bool m_bRecordEnabled;
+		bool m_bGenerativeSwapMode;
 
-	/**
-	 * Central instance of the audio engine. 
-	 */
-	AudioEngine*	m_pAudioEngine;
+		/**
+		 * Central instance of the audio engine.
+		 */
+		AudioEngine*	m_pAudioEngine;
 		std::shared_ptr<MidiActionManager> m_pMidiActionManager;
 
-	std::shared_ptr<SoundLibraryDatabase> m_pSoundLibraryDatabase;
+		std::shared_ptr<SoundLibraryDatabase> m_pSoundLibraryDatabase;
 
-	std::shared_ptr<Playlist> m_pPlaylist;
+		std::shared_ptr<Playlist> m_pPlaylist;
 
-	/** Controls the instrument selection within a hihat group. */
-	Midi::Parameter m_hihatOpenness;
+		/** Controls the instrument selection within a hihat group. */
+		Midi::Parameter m_hihatOpenness;
 
-	/**
-	 * Cache last incoming MIDI event to be used in #MidiSenseWidget.
-	 */
-	MidiEvent::Type m_lastMidiEvent;
-	Midi::Parameter m_lastMidiEventParameter;
+		/**
+		 * Cache last incoming MIDI event to be used in #MidiSenseWidget.
+		 */
+		MidiEvent::Type m_lastMidiEvent;
+		Midi::Parameter m_lastMidiEventParameter;
 
-	/** The update of the Director is event-based. But if the widget is not
-	 * visible (probably most of the time) we do omit the corresponding
-	 * event for better performance. */
-	bool m_bSendBbtChangeEvents;
+		/** The update of the Director is event-based. But if the widget is not
+		 * visible (probably most of the time) we do omit the corresponding
+		 * event for better performance. */
+		bool m_bSendBbtChangeEvents;
 
-};
+	};
 
-inline bool Hydrogen::getIsExportSessionActive() const
-{
-	return m_bExportSessionIsActive;
-}
+	inline bool Hydrogen::getIsExportSessionActive() const
+	{
+		return m_bExportSessionIsActive;
+	}
 
-inline AudioEngine* Hydrogen::getAudioEngine() const {
-	return m_pAudioEngine;
-}
-inline std::shared_ptr<MidiActionManager> Hydrogen::getMidiActionManager() const {
-	return m_pMidiActionManager;
-}
+	inline AudioEngine* Hydrogen::getAudioEngine() const {
+		return m_pAudioEngine;
+	}
+	inline std::shared_ptr<MidiActionManager> Hydrogen::getMidiActionManager() const {
+		return m_pMidiActionManager;
+	}
 
-inline const Hydrogen::GUIState& Hydrogen::getGUIState() const {
-	return m_GUIState;
-}
+	inline const Hydrogen::GUIState& Hydrogen::getGUIState() const {
+		return m_GUIState;
+	}
 
-inline void Hydrogen::setGUIState( const Hydrogen::GUIState& state ) {
-	m_GUIState = state;
-}
-inline int Hydrogen::getSelectedPatternNumber() const
-{
-	return m_nSelectedPatternNumber;
-}
-inline int Hydrogen::getSelectedInstrumentNumber() const
-{
-	return m_nSelectedInstrumentNumber;
-}
+	inline void Hydrogen::setGUIState( const Hydrogen::GUIState& state ) {
+		m_GUIState = state;
+	}
+	inline int Hydrogen::getSelectedPatternNumber() const
+	{
+		return m_nSelectedPatternNumber;
+	}
+	inline int Hydrogen::getSelectedInstrumentNumber() const
+	{
+		return m_nSelectedInstrumentNumber;
+	}
 
-inline bool Hydrogen::getRecordEnabled() const {
-	return m_bRecordEnabled;
-}
-inline void Hydrogen::setRecordEnabled( bool bEnabled ) {
-	m_bRecordEnabled = bEnabled;
-}
+	inline bool Hydrogen::getRecordEnabled() const {
+		return m_bRecordEnabled;
+	}
+	inline void Hydrogen::setRecordEnabled( bool bEnabled ) {
+		m_bRecordEnabled = bEnabled;
+	}
 
-inline void Hydrogen::setSessionIsExported( bool bSessionIsExported ) {
-	m_bSessionIsExported = bSessionIsExported;
-}
-inline bool Hydrogen::getSessionIsExported() const {
-	return m_bSessionIsExported;
-}
-inline const MidiEvent::Type& Hydrogen::getLastMidiEvent() const {
-	return m_lastMidiEvent;
-}
-inline void Hydrogen::setLastMidiEvent( const MidiEvent::Type& event ) {
-	m_lastMidiEvent = event;
-}
-inline Midi::Parameter Hydrogen::getLastMidiEventParameter() const {
-	return m_lastMidiEventParameter;
-}
-inline void	Hydrogen::setLastMidiEventParameter( Midi::Parameter parameter ) {
-	m_lastMidiEventParameter = parameter;
-}
-inline std::shared_ptr<Playlist> Hydrogen::getPlaylist() const {
-	return m_pPlaylist;
-}
-inline void Hydrogen::setPlaylist( std::shared_ptr<Playlist> pPlaylist ){
-	m_pPlaylist = pPlaylist;
-}
-inline std::shared_ptr<TimeHelper> Hydrogen::getTimeHelper() const {
-	return m_pTimeHelper;
-}
-inline Midi::Parameter Hydrogen::getHihatOpenness() const {
-	return m_hihatOpenness;
-}
-inline void Hydrogen::setHihatOpenness( Midi::Parameter openness ) {
-	m_hihatOpenness = openness;
-}
-inline int Hydrogen::getBeatCounterTotalBeats() const {
-	return m_nBeatCounterTotalBeats;
-}
-inline float Hydrogen::getBeatCounterBeatLength() const {
-	return m_fBeatCounterBeatLength;
-}
-inline int Hydrogen::getBeatCounterEventCount() const {
-	return m_nBeatCounterEventCount;
-}
-inline bool Hydrogen::getSendBbtChangeEvents() const {
-	return m_bSendBbtChangeEvents;
-}
-inline void Hydrogen::setSendBbtChangeEvents( bool bSend ) {
-	m_bSendBbtChangeEvents = bSend;
-}
+	inline bool Hydrogen::getGenerativeSwapMode() const {
+		return m_bGenerativeSwapMode;
+	}
+	inline void Hydrogen::setGenerativeSwapMode( bool bEnabled ) {
+		m_bGenerativeSwapMode = bEnabled;
+	}
+
+	inline void Hydrogen::setSessionIsExported( bool bSessionIsExported ) {
+		m_bSessionIsExported = bSessionIsExported;
+	}
+	inline bool Hydrogen::getSessionIsExported() const {
+		return m_bSessionIsExported;
+	}
+	inline const MidiEvent::Type& Hydrogen::getLastMidiEvent() const {
+		return m_lastMidiEvent;
+	}
+	inline void Hydrogen::setLastMidiEvent( const MidiEvent::Type& event ) {
+		m_lastMidiEvent = event;
+	}
+	inline Midi::Parameter Hydrogen::getLastMidiEventParameter() const {
+		return m_lastMidiEventParameter;
+	}
+	inline void	Hydrogen::setLastMidiEventParameter( Midi::Parameter parameter ) {
+		m_lastMidiEventParameter = parameter;
+	}
+	inline std::shared_ptr<Playlist> Hydrogen::getPlaylist() const {
+		return m_pPlaylist;
+	}
+	inline void Hydrogen::setPlaylist( std::shared_ptr<Playlist> pPlaylist ){
+		m_pPlaylist = pPlaylist;
+	}
+	inline std::shared_ptr<TimeHelper> Hydrogen::getTimeHelper() const {
+		return m_pTimeHelper;
+	}
+	inline Midi::Parameter Hydrogen::getHihatOpenness() const {
+		return m_hihatOpenness;
+	}
+	inline void Hydrogen::setHihatOpenness( Midi::Parameter openness ) {
+		m_hihatOpenness = openness;
+	}
+	inline int Hydrogen::getBeatCounterTotalBeats() const {
+		return m_nBeatCounterTotalBeats;
+	}
+	inline float Hydrogen::getBeatCounterBeatLength() const {
+		return m_fBeatCounterBeatLength;
+	}
+	inline int Hydrogen::getBeatCounterEventCount() const {
+		return m_nBeatCounterEventCount;
+	}
+	inline bool Hydrogen::getSendBbtChangeEvents() const {
+		return m_bSendBbtChangeEvents;
+	}
+	inline void Hydrogen::setSendBbtChangeEvents( bool bSend ) {
+		m_bSendBbtChangeEvents = bSend;
+	}
 };
 
 #endif
-
