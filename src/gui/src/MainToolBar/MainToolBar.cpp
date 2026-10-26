@@ -175,16 +175,30 @@ MainToolBar::MainToolBar( QWidget* pParent )
 	} );
 	pEditorGroup->addAction( m_pSongModeAction );
 
-	// Generative Swap Global Toolbar Toggle
-	m_pGenerativeSwapAction = createAction( tr( "Generative Swap" ) );
+	// Generative Swap Global Toolbar Toggle (Created directly, not via createAction)
+	m_pGenerativeSwapAction = new QAction( this );
 	m_pGenerativeSwapAction->setObjectName( "MainToolBarGenerativeSwapButton" );
 
-	// (The rogue setIcon line that was here is now deleted!)
+	// Point directly to your installed local icon path to avoid resource errors
+	QString sDicePath = "/home/nini/hydrocephalus/local_install/share/hydrogen/data/img/scalable/icons/black/dice.svg";
+	m_pGenerativeSwapAction->setIcon( QIcon( sDicePath ) );
 
+	m_pGenerativeSwapAction->setText( tr( "Generative Swap" ) );
+	m_pGenerativeSwapAction->setCheckable( true );
 	m_pGenerativeSwapAction->setChecked( Hydrogen::get_instance()->getGenerativeSwapMode() );
+
 	connect( m_pGenerativeSwapAction, &QAction::triggered, [=]() {
 		const bool bChecked = m_pGenerativeSwapAction->isChecked();
 		Hydrogen::get_instance()->setGenerativeSwapMode( bChecked );
+
+		// Force the audio engine to update virtual patterns immediately
+		auto pEngine = Hydrogen::get_instance()->getAudioEngine();
+		if ( pEngine ) {
+			pEngine->lock( RIGHT_HERE );
+			pEngine->updateVirtualPatterns();
+			pEngine->unlock();
+		}
+
 		if ( bChecked ) {
 			HydrogenApp::get_instance()->showStatusBarMessage( tr( "Generative Swap mode = On" ) );
 		}
@@ -192,6 +206,9 @@ MainToolBar::MainToolBar( QWidget* pParent )
 			HydrogenApp::get_instance()->showStatusBarMessage( tr( "Generative Swap mode = Off" ) );
 		}
 	} );
+
+	// Add the action to the toolbar and cap it with a separator
+	addAction( m_pGenerativeSwapAction );
 	addCustomSeparator();
 
 	////////////////////////////////////////////////////////////////////////////
@@ -1231,11 +1248,6 @@ void MainToolBar::updateIcons()
 
 	m_pBpmTap->updateIcons();
 	m_pMidiControlButton->updateIcons();
-	qWarning() << "[DEBUG] Setting dice icon path to:" << ( sIconPath + "dice.svg" );
-	qWarning() << "[DEBUG] Full resolved dice icon path exists?:" << QFile::exists( sIconPath + "dice.svg" );
-
-	// Use the absolute path right here:
-	m_pGenerativeSwapAction->setIcon( QIcon( "/home/nini/hydrocephalus/local_install/share/hydrogen/data/img/scalable/icons/black/dice.svg" ) );
 }
 
 void MainToolBar::updateStyleSheet()

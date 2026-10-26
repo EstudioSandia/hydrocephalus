@@ -467,7 +467,6 @@ namespace H2Core
 		std::shared_ptr<PatternList> pPatternList
 	)
 	{
-		std::cout << "[HYDROCEPHALUS DEBUG] addFlattenedVirtualPatterns called for pattern: " << getName().toStdString() << std::endl;
 
 		if ( m_virtualPatterns.empty() ) {
 			return;
@@ -487,9 +486,6 @@ namespace H2Core
 				// Randomly select ONLY ONE pattern from the pool
 				int randomIndex = rand() % candidates.size();
 				auto chosenPattern = candidates[randomIndex];
-
-				std::cout << "[HYDROCEPHALUS DEBUG] Generative Swap Active! Rolled index " << randomIndex
-				<< " -> Chosen Pattern: " << chosenPattern->getName().toStdString() << std::endl;
 
 				// Inject the single chosen pattern directly into the active playback list!
 				pPatternList->add( chosenPattern, true );
